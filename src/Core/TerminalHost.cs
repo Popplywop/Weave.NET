@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Weave;
 
-internal sealed class TerminalHost : IDisposable
+public sealed class TerminalHost : IDisposable
 {
     // Windows VT setup
     const int STD_OUTPUT_HANDLE = -11;
@@ -13,20 +13,18 @@ internal sealed class TerminalHost : IDisposable
     const int ENABLE_PROCESSED_INPUT = 0x0001;
     const int ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
 
-    const string CSI = "\x1b[";
-
     public TerminalHost()
     {
         Console.OutputEncoding = new UTF8Encoding(false);
         EnableVT();
 
         // Enter alternate screen & hide cursor
-        Write("\x1b[?1049h"); // alt screen
-        Write("\x1b[?25l");   // hide cursor
+        Write(AnsiStrings.ENABLE_ALT_SCREEN);
+        Write(AnsiStrings.HIDE_CURSOR);
         Clear();
     }
 
-    public static void Clear() => Write($"{CSI}2J{CSI}H");
+    public static void Clear() => Write(AnsiStrings.CLEAR_SCREEN);
     public static void Write(string s) => Console.Out.Write(s);
 
     public static void EnableVT()
@@ -42,6 +40,7 @@ internal sealed class TerminalHost : IDisposable
             modeOut |= ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
             NativeMethod.SetConsoleMode(hOut, modeOut);
         }
+
         var hIn = NativeMethod.GetStdHandle(STD_INPUT_HANDLE);
         if (NativeMethod.GetConsoleMode(hIn, out int modeIn))
         {
@@ -53,7 +52,7 @@ internal sealed class TerminalHost : IDisposable
     public void Dispose()
     {
         // Show cursor & leave alternate screen
-        Write("\x1b[?25h");
-        Write("\x1b[?1049l");
+        Write(AnsiStrings.VISIBLE_CURSOR);
+        Write(AnsiStrings.DISABLE_ALT_SCREEN);
     }
 }
