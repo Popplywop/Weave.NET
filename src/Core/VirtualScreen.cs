@@ -1,5 +1,4 @@
 using System.Text;
-
 using Weave.Structs;
 
 namespace Weave;
