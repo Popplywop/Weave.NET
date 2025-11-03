@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Weave;
 
-public sealed class TerminalHost : IDisposable
+internal sealed class TerminalHost : IDisposable
 {
     // Windows VT setup
     const int STD_OUTPUT_HANDLE = -11;
