@@ -5,15 +5,14 @@ namespace Weave;
 
 internal sealed class VirtualScreen
 {
-    public int Rows { get; private set; }
-    public int Cols { get; private set; }
-
-    readonly Lock _sync = new();
-
+    private readonly Lock _sync = new();
     private Cell[,] _prev = new Cell[0, 0];
     private Cell[,] _next = new Cell[0, 0];
 
     public VirtualScreen(int rows, int cols) => Resize(rows, cols);
+
+    public int Rows { get; private set; }
+    public int Cols { get; private set; }
 
     public void Resize(int rows, int cols)
     {
