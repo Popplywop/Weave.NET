@@ -4,7 +4,7 @@ using Weave.Structs;
 
 namespace Weave;
 
-sealed class VirtualScreen
+internal sealed class VirtualScreen
 {
     public int Rows { get; private set; }
     public int Cols { get; private set; }

@@ -1,6 +1,6 @@
 namespace Weave.Structs;
 
-readonly record struct Rect(int X,int Y,int W,int H)
+internal readonly record struct Rect(int X,int Y,int W,int H)
 {
     public int Right => X+W-1;
     public int Bottom => Y+H-1;
