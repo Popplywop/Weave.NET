@@ -36,8 +36,12 @@ internal sealed class VirtualScreen
     public void ClearNext_Nolock()
     {
         for (int r = 0; r < Rows; r++)
+        { 
             for (int c = 0; c < Cols; c++)
-                _next[r, c] = Cell.Blank;
+            { 
+                _next[r, c] = Cell.Blank; 
+            } 
+        }
     }
 
     public void Put(int row, int col, string text)
