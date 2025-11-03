@@ -46,16 +46,25 @@ internal sealed class VirtualScreen
 
     public void Put(int row, int col, string text)
     {
-        if (string.IsNullOrEmpty(text)) return;
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
 
         lock (_sync)
         {
-            if (row < 0 || row >= Rows) return;
+            if (row < 0 || row >= Rows)
+            {
+                return;
+            }
+
             for (int i = 0; i < text.Length; i++)
             {
                 int cc = col + i;
                 if (cc >= 0 && cc < Cols)
+                {
                     _next[row, cc].Ch = text[i];
+                }
             }
         }
     }
@@ -65,7 +74,9 @@ internal sealed class VirtualScreen
         lock (_sync)
         {
             if (row >= 0 && row < Rows && col >= 0 && col < Cols)
+            {
                 _next[row, col].Ch = ch;
+            }
         }
     }
 
@@ -108,18 +119,28 @@ internal sealed class VirtualScreen
                         sb.Append(snapshot[r, c].Ch); c++;
                     }
                 }
-                else c++;
+                else
+                {
+                    c++;
+                }
             }
         }
-        if (sb.Length > 0) await Console.Out.WriteAsync(sb.ToString());
+        if (sb.Length > 0)
+        {
+            await Console.Out.WriteAsync(sb.ToString());
+        }
 
         lock (_sync)
         {
             _prev = snapshot;
 
             for (int r = 0; r < Rows; r++)
+            {
                 for (int c = 0; c < Cols; c++)
+                {
                     _next[r, c] = snapshot[r, c];
+                }
+            }
         }
     }
 }
