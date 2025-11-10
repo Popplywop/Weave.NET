@@ -1,9 +1,8 @@
-// File: UI/Input/FocusManager.cs
 using System.Collections.Concurrent;
 
 namespace Weave.UI;
 
-public sealed class FocusManager
+public sealed class FocusManager : IFocusManager
 {
     // "NodeId" is a unique identifier for an instance/component in your tree.
     // For MVP, use Guid or an incrementing int. Hook it to your reconciler's instances later.

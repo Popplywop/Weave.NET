@@ -1,4 +1,3 @@
-// File: UI/Input/InputEvents.cs
 namespace Weave.UI;
 
 [Flags]
@@ -14,12 +13,7 @@ public sealed record KeyEvent(
 
 public enum MouseButton { Left, Middle, Right }
 public enum MouseAction { Down, Up, Move, Wheel }
+
 public sealed record MouseEvent(
     int X, int Y, MouseButton Button, MouseAction Action, int Delta = 0, KeyMods Mods = KeyMods.None
 ) : InputEvent;
-
-// Handlers return true if they handled the event and want to stop bubbling.
-public interface IInputHandler
-{
-    bool OnInput(InputEvent e);
-}

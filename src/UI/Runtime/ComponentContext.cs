@@ -7,6 +7,7 @@ public sealed class ComponentContext
 
     internal Action? RequestRerender { get; set; }
     internal List<Action> PostCommitEffects { get; } = [];
+    internal IFocusManager? FocusManager { get; set; }
 
     public (T value, Action<T> set) UseState<T>(T initial)
     {

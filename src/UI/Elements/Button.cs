@@ -1,62 +1,64 @@
-// File: UI/Elements/Button.cs
 namespace Weave.UI;
 
 public sealed record ButtonProps(string Label, Action OnPress, bool Disabled = false, TextStyle? Style = null);
 
-// A small adaptor that lets the Button register itself as a focusable input handler.
-public sealed class ButtonInput : IInputHandler
-{
-    private readonly Func<bool> _disabled;
-    private readonly Action _activate;
-
-    public ButtonInput(Func<bool> disabled, Action activate)
-    {
-        _disabled = disabled;
-        _activate = activate;
-    }
-
-    public bool OnInput(InputEvent e)
-    {
-        if (_disabled())
-        {
-            return false;
-        }
-
-        if (e is KeyEvent { Key: ConsoleKey.Enter } or KeyEvent { Key: ConsoleKey.Spacebar })
-        {
-            _activate();
-            return true;
-        }
-        return false;
-    }
-}
-
 public static class Button
 {
-    public static VNode Create(ComponentContext ctx, FocusManager focus, ButtonProps p)
+    public static VNode Create(ComponentContext ctx, ButtonProps p)
+    {
+        var focus = ctx.FocusManager ?? throw new InvalidOperationException("FocusManager not available in ComponentContext");
+        return CreateInternal(ctx, focus, p);
+    }
+
+    public static VNode Create(ComponentContext ctx, IFocusManager focus, ButtonProps p)
+    {
+        return CreateInternal(ctx, focus, p);
+    }
+
+    private static VBorder CreateInternal(ComponentContext ctx, IFocusManager focus, ButtonProps p)
     {
         var (pressed, setPressed) = ctx.UseState(false);
+        var (isProcessing, setIsProcessing) = ctx.UseState(false);
 
         void Activate()
         {
-            if (p.Disabled)
+            if (p.Disabled || isProcessing)
             {
-                return;
+                return; // Prevent multiple rapid presses
             }
 
+            setIsProcessing(true);
             setPressed(true);
+
+            // Execute the action immediately
             p.OnPress();
-            setPressed(false);
+
+            // Reset state after visual feedback delay
+            _ = Task.Delay(150).ContinueWith(_ =>
+            {
+                setPressed(false);
+                setIsProcessing(false);
+            });
         }
 
-        // Register with focus manager on mount; unregister on unmount.
-        var nodeId = FocusManager.NodeId.New();
-        ctx.UseEffect(() =>
+        // Create stable NodeId based on button label
+        var stableId = $"btn-{p.Label}".GetHashCode();
+        var nodeId = new FocusManager.NodeId(new Guid(stableId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+        // Always update handler to get fresh closures, but prevent duplicate focus ring entries
+        var handler = new ButtonInputHandler(() => p.Disabled || isProcessing, Activate);
+        var alreadyRegistered = focus.TryGetHandler(nodeId, out _);
+
+        if (alreadyRegistered)
         {
-            var handler = new ButtonInput(() => p.Disabled, Activate);
+            // Update handler but don't add to focus ring again
+            focus.Register(nodeId, handler, focusable: false);
+        }
+        else
+        {
+            // First registration - add to focus ring
             focus.Register(nodeId, handler, focusable: true);
-            return; // if you add cleanup support later, call focus.Unregister(nodeId)
-        });
+        }
 
         var border = pressed ? new BorderStyle('═','║','╔','╗','╚','╝') : new BorderStyle();
 
