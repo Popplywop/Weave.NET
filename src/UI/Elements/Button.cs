@@ -1,6 +1,12 @@
 namespace Weave.UI;
 
-public sealed record ButtonProps(string Label, Action OnPress, bool Disabled = false, TextStyle? Style = null);
+public sealed record ButtonProps(
+    string Label,
+    Action OnPress,
+    bool Disabled = false,
+    TextStyle? Style = null,
+    IEnumerable<ButtonActivationKey>? ActivationKeys = null
+);
 
 public static class Button
 {
@@ -46,7 +52,8 @@ public static class Button
         var nodeId = new FocusManager.NodeId(new Guid(stableId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 
         // Always update handler to get fresh closures, but prevent duplicate focus ring entries
-        var handler = new ButtonInputHandler(() => p.Disabled || isProcessing, Activate);
+        var activationKeys = p.ActivationKeys ?? ButtonInputHandler.DefaultActivationKeys;
+        var handler = new ButtonInputHandler(() => p.Disabled || isProcessing, Activate, activationKeys);
         var alreadyRegistered = focus.TryGetHandler(nodeId, out _);
 
         if (alreadyRegistered)

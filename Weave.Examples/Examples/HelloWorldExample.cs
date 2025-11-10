@@ -26,11 +26,32 @@ public static class HelloWorldExample
                     Button.Create(ctx, new ButtonProps(
                         Label: "Click me!",
                         OnPress: () => setCounter(counter + 1)
+                        // Uses default keys: Enter and Space
                     )),
                     Spacer()
                 ),
                 Text(""),
-                Text("Press Tab to navigate, Enter/Space to activate, Ctrl+C to exit", align: Align.Center)
+                Row(
+                    Spacer(),
+                    Button.Create(ctx, new ButtonProps(
+                        Label: "Shift+C = +5!",
+                        OnPress: () => setCounter(counter + 5),
+                        ActivationKeys: [new ButtonActivationKey(ConsoleKey.C, KeyMods.Shift)]
+                    )),
+                    Spacer()
+                ),
+                Text(""),
+                Row(
+                    Spacer(),
+                    Button.Create(ctx, new ButtonProps(
+                        Label: "Ctrl+R = Reset",
+                        OnPress: () => setCounter(0),
+                        ActivationKeys: [new ButtonActivationKey(ConsoleKey.R, KeyMods.Ctrl)]
+                    )),
+                    Spacer()
+                ),
+                Text(""),
+                Text("Tab to navigate, Enter/Space for default, Shift+C for +5, Ctrl+R to reset, Ctrl+C to exit", align: Align.Center)
             )
         );
     }
